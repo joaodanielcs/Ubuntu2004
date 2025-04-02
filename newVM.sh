@@ -13,7 +13,7 @@ if [[ "$BOOT_OPTION" =~ ^[Ss]im$ ]]; then
 fi
 
 # Listar ISOs disponíveis
-ISO_DIR="/var/lib/vz/template/iso/" 
+ISO_DIR="/var/lib/vz/template/iso" 
 echo "Arquivos ISO disponíveis:"
 ISO_FILES=($(ls "$ISO_DIR"/*.iso))
 for i in "${!ISO_FILES[@]}"; do
@@ -21,6 +21,7 @@ for i in "${!ISO_FILES[@]}"; do
 done
 
 read -p "Escolha a ISO para instalação: " OPTION
+ISO="${ISO_FILES[$((OPTION-1))]}"
 
 # Configurações do disco
 read -p "Escolha o storage para 'TPM Storage' (e disco): " STORAGE
