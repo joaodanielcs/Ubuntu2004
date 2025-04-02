@@ -25,16 +25,16 @@ fi
 
 # Listar ISOs disponíveis
 ISO_DIR="/var/lib/vz/template/iso" 
-echo "\n\nArquivos ISO disponíveis:"
+echo -e "\n\nArquivos ISO disponíveis:"
 ISO_FILES=($(ls "$ISO_DIR"/*.iso))
 for i in "${!ISO_FILES[@]}"; do
     echo "$((i+1)). $(basename "${ISO_FILES[$i]}")"
 done
-
-read -p "\nEscolha a ISO para instalação. Opção: " OPTION
+echo ""
+read -p "Escolha a ISO para instalação. Opção: " OPTION
 ISO="${ISO_FILES[$((OPTION-1))]}"
 
-echo "\n\nLocais de armazenamento disponíveis para VMs:"
+echo -e "\n\nLocais de armazenamento disponíveis para VMs:"
 echo "--------------------------------------------"
 
 # Lista os armazenamentos compatíveis e ativos para VMs
