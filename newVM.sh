@@ -4,7 +4,6 @@ echo "=== Criando VM no Proxmox ==="
 
 # Perguntar informações
 read -p "Digite o ID da VM: " VMID
-read -p "Digite o nome do node onde a VM será criada: " NODE
 read -p "Digite o hostname da VM: " HOSTNAME
 read -p "Iniciar no boot? (Sim/Não): " BOOT_OPTION
 BOOT="0"
@@ -59,11 +58,14 @@ read -p "Digite o gateway: " GATEWAY
 
 # Criar a VM
 echo "Criando a VM..."
-qm create $VMID --name $HOSTNAME --node $NODE --memory $MEMORY --cores $CORES --net0 virtio,bridge=vmbr0,ip=$IP_CIDR,gw=$GATEWAY \
+qm create $VMID --name $HOSTNAME --memory $MEMORY --cores $CORES --net0 virtio,bridge=vmbr0,ip=$IP_CIDR,gw=$GATEWAY \
   --boot c --bootdisk scsi0 --onboot $BOOT --ostype l26 --agent 1 \
   --machine q35 --cpu host --numa 1 \
   --scsihw virtio-scsi-pci --scsi0 $STORAGE:$DISK_SIZE \
-  --kvm 1 --bios ovmf --tpmstate 1 --tpmstorage $STORAGE
+  --kvm 1 --bios ovmf --efidisk0 $STORAGE:1
+
+# Adiciona o TPM com armazenamento especificado
+qm set $VMID --tpmstate0 $STORAGE:4,size=4M,version=v2.0
 
 # Adicionar ISO
 echo "Adicionando a ISO..."
