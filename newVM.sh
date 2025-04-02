@@ -81,7 +81,7 @@ echo "Criando a VM..."
 
 qm create $VMID -agent 1 -machine q35 -tablet 0 -localtime 1 -bios ovmf -cpu host -numa 1 -cores $CORES -memory $MEMORY \
   -name $HOSTNAME -net0 virtio,bridge=vmbr0 -onboot $BOOT -ostype l26 -scsihw virtio-scsi-pci -scsi0 $STORAGE:$DISK_SIZE \
-  -boot c -bootdisk scsi0 -kvm 1 -boot order=ide2,dc,s
+  -boot c -bootdisk scsi0 -kvm 1 -boot order=ide2,scsi0
 
 # Configurar IP e Gateway
 qm set $VMID -ipconfig0 ip=$IP_CIDR,gw=$GATEWAY
@@ -102,3 +102,6 @@ qm set $VMID -scsi0 $STORAGE:$DISK_SIZE,ssd=1,iothread=1,cache=writeback
 qm set $VMID -balloon 0
 
 echo "VM criada com sucesso!"
+
+qm start $VMID
+qm set $VMID -boot order=scsi0
