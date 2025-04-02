@@ -14,7 +14,7 @@ fi
 
 # Listar ISOs disponíveis
 echo "=== ISOs disponíveis no storage 'local' ==="
-pvesh get /nodes/$NODE/storage/local/content --output-format json | jq -r '.[] | select(.content == "iso") | .volid'
+pvesh get /var/lib/vz/template/iso/ --output-format json | jq -r '.[] | select(.content == "iso") | .volid'
 read -p "Escolha a ISO para instalação (volid): " ISO
 
 # Configurações do disco
