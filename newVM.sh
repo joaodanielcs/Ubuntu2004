@@ -13,9 +13,14 @@ if [[ "$BOOT_OPTION" =~ ^[Ss]im$ ]]; then
 fi
 
 # Listar ISOs disponíveis
-echo "=== ISOs disponíveis no storage 'local' ==="
-pvesh get /var/lib/vz/template/iso/ --output-format json | jq -r '.[] | select(.content == "iso") | .volid'
-read -p "Escolha a ISO para instalação (volid): " ISO
+ISO_DIR="/var/lib/vz/template/iso/" 
+echo "Arquivos ISO disponíveis:"
+ISO_FILES=($(ls "$ISO_DIR"/*.iso))
+for i in "${!ISO_FILES[@]}"; do
+    echo "$((i+1)). $(basename "${ISO_FILES[$i]}")"
+done
+
+read -p "Escolha a ISO para instalação: " OPTION
 
 # Configurações do disco
 read -p "Escolha o storage para 'TPM Storage' (e disco): " STORAGE
