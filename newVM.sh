@@ -5,13 +5,15 @@ echo "=== Criando VM no Proxmox ==="
 # Perguntar informações
 while true; do
     read -p "Qual a ID da VM: " VMID
-    # Verifica se a VMID está em uso
-    if qm list | awk '{print $1}' | grep -q "^$VMID$"; then
-        echo "A ID $VMID já está em uso. Por favor, insira outra."
+
+    # Verifica se a ID já está em uso no Proxmox
+    if qm list | awk '{print $1}' | grep -q "^$VMID$" || pct list | awk '{print $1}' | grep -q "^$VMID$"; then
+        echo "A ID $VMID já está em uso por uma VM, CT ou Template. Por favor, insira outra."
     else
         break
     fi
 done
+
 read -p "Digite o hostname da VM: " HOSTNAME
 read -p "Iniciar no boot? (S/N): " BOOT_OPTION
 BOOT="0"
