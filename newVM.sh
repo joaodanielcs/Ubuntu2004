@@ -72,18 +72,29 @@ read -p "Digite o gateway: " GATEWAY
 
 # Criar a VM
 clear
+if [[ $OPTION -lt 1 || $OPTION -gt ${#ISO_FILES[@]} ]]; then
+    echo "Opção inválida. Por favor, escolha um número entre 1 e ${#ISO_FILES[@]}."
+    break
+fi
+
 echo "Criando a VM..."
 
 qm create $VMID -agent 1 -machine q35 -tablet 0 -localtime 1 -bios ovmf -cpu host -numa 1 -cores $CORES -memory $MEMORY \
-  -name $HOSTNAME -net0 virtio,bridge=vmbr0,ip=$IP_CIDR,gw=$GATEWAY -onboot $BOOT -ostype l26 -scsihw virtio-scsi-pci -scsi0 $STORAGE:$DISK_SIZE \
+  -name $HOSTNAME -net0 virtio,bridge=vmbr0 -onboot $BOOT -ostype l26 -scsihw virtio-scsi-pci -scsi0 $STORAGE:$DISK_SIZE \
   -boot c -bootdisk scsi0 -kvm 1 -efidisk0 $STORAGE:1
+
+# Configurar IP e Gateway
+qm set $VMID -ipconfig0 ip=$IP_CIDR,gw=$GATEWAY
 
 # Adiciona o TPM com armazenamento especificado
 qm set $VMID -tpmstate0 $STORAGE:4,size=4M,version=v2.0
 
 # Adicionar ISO
 echo "Adicionando a ISO..."
-qm set $VMID -cdrom $ISO
+if ! qm set $VMID -cdrom $ISO; then
+    echo "Erro ao adicionar a ISO."
+    break
+fi
 
 # Configurações avançadas
 echo "Ativando configurações avançadas..."
