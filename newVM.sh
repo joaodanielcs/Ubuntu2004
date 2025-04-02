@@ -20,14 +20,37 @@ for i in "${!ISO_FILES[@]}"; do
     echo "$((i+1)). $(basename "${ISO_FILES[$i]}")"
 done
 
-read -p "Escolha a ISO para instalação: " OPTION
+read -p "Escolha a ISO para instalação. Opção: " OPTION
 ISO="${ISO_FILES[$((OPTION-1))]}"
 
-# Configurações do disco
-read -p "Escolha o storage para 'TPM Storage' (e disco): " STORAGE
+echo "Locais de armazenamento disponíveis para VMs:"
+echo "--------------------------------------------"
+
+# Lista os armazenamentos compatíveis e ativos para VMs
+STORAGE_OPTIONS=($(pvesm status | awk '$3 == "active" && ($2 == "dir" || $2 == "lvmthin" || $2 == "rbd") {print $1}'))
+
+# Filtra apenas os armazenamentos com suporte a "images"
+FILTERED_OPTIONS=()
+for STORAGE in "${STORAGE_OPTIONS[@]}"; do
+    if pvesm list "$STORAGE" | grep -q "images"; then
+        FILTERED_OPTIONS+=("$STORAGE")
+    fi
+done
+
+# Exibe as opções numeradas
+for i in "${!FILTERED_OPTIONS[@]}"; do
+    echo "$((i+1)). ${FILTERED_OPTIONS[$i]}"
+done
+
+# Lê a opção selecionada
+read -p "Escolha o local do armazenamento. Opção: " OPTION
+
+# Coloca o nome do armazenamento escolhido na variável STORAGE
+STORAGE="${FILTERED_OPTIONS[$((OPTION-1))]}"
+
 read -p "Digite o tamanho do disco em GB: " DISK_SIZE
 read -p "Quantos cores a VM deve usar? " CORES
-read -p "Quantidade de memória em GB (será convertida para MB): " MEMORY_GB
+read -p "Quantidade de memória em GB: " MEMORY_GB
 MEMORY=$((MEMORY_GB * 1024))
 
 # Configurações de rede
